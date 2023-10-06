@@ -1,0 +1,66 @@
+---
+pagination:
+    data: cms_fetch_pages
+    size: 1
+    alias: cms_page
+permalink: "discussions/{{ cms_page.permalink }}"
+---
+<!doctype html>
+<html lang="{{ cms_page.language }}">
+<head>
+    <!-- COMMON METADATA -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="msapplication-starturl" content="{{ page.url }}">
+    <meta property="og:url" content="{{ page.url }}">
+    <meta name="twitter:url" content="{{ page.url }}">
+
+    {%- render 'model_page_metadata',
+        cms_page: cms_page,
+        envmode: site.environment
+    -%}
+
+    <style>
+        /* retrait style <details> par défaut de iOS */
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        /* retrait style <button> et <select> par défaut de iOS */
+        select, button {
+            color: black
+        }
+    </style>
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_css_variables.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_fonts.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_dis_generic.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_dis_extension.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_dim_generic.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_dim_extension.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_pos_generic.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_pos_extension.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_txt_generic.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_txt_extension.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_skin_generic.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_skin_extension.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_utilities_generic.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/briks_html.css">
+    <link rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/fonts/icomoon/style.css">
+
+</head>
+
+<body>
+    
+    <main class="
+        c-dis m-flex m-column m-gap-8
+        c-dim m-maxw-3 m-m-auto m-p-10">
+        {% for content in cms_page.discussion %}
+            {%  render 'model_blockquote.liquid',
+                content: content,
+                personas: cms_fetch_personas,
+                site: site
+            %}
+        {% endfor %}
+    </main>
+</body>
+
+</html>

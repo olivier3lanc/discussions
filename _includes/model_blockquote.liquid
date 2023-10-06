@@ -1,0 +1,49 @@
+{% assign filtered_personas = personas | where: "id", content.persona_id %}
+{% assign persona = filtered_personas|first %}
+<blockquote class="
+    c-dis m-flex m-column
+    c-pos m-relative
+    c-dim m-m-0"
+    cite="">
+    <p class="
+        c-dim m-m-0 {% if content.alignment == 'right' %}m-pr-9 m-pl-7{% else %}m-pl-9 m-pr-7{% endif %} m-pt-5 m-pb-6
+        c-txt m-ff-lead-500 m-fs-7 m-lh-5
+        c-skin m-bc-{{ content.theme_color_name }}-100 m-c-{{ content.theme_color_name }}-800 m-brad-5">
+        {{ content.text }}
+    </p>
+    <footer class="
+        c-dis m-flex {% if content.alignment == 'right' %}m-main-end{% endif %}
+        c-dim m-order--1
+        c-skin m-c-grey-light-800">
+        <figure class="
+            c-dis m-flex
+            c-pos m-absolute m-top-0  m-offset-50-0 {% if content.alignment == 'right' %}m-right-0{% else %}m-right-100{% endif %}
+            c-dim m-p-7 m-m-0 m-o-hidden
+            c-txt m-ff-lead-700 m-fs-7 m-lh-1
+            c-skin m-bc-grey-light-200 m-bwidth-3 m-bradtl-6 m-bradtr-6 {% if content.alignment == 'right' %}m-bradbr-6{% else %}m-bradbl-6{% endif %} m-bstyle-solid m-bcolor-{{ content.theme_color_name }}-200"
+            style="aspect-ratio:1/1;">
+            {% assign initials_array = persona.name|split: ' ' %}
+            {% assign initials = '' %}
+            {% for word in initials_array limit:2 %}
+                {% assign truncated_word = word|truncate: 1, '' %}
+                {% assign initials = initials|append: truncated_word %}
+            {% endfor %}
+            <img src="{{ site.imgsrv }}{{ site.imgroot }}{{ persona.image_url.path }}&output=webp&q=50&w=512&h=512&fit=cover" 
+                alt="{{ persona.name }}" 
+                class="
+                c-pos m-absolute m-top-50 m-left-50 m-offset-50-50
+                c-dim m-h-100 m-w-auto">
+            <figcaption class="c-pos m-absolute m-top-50 m-left-50 m-offset-50-50 c-skin m-c-grey-100">{{ initials }}</figcaption>
+        </figure>
+        <p class="
+            c-dis m-flex m-cross-baseline m-gap-2
+            c-dim m-m-0 m-pb-2 {% if content.alignment == 'right' %}m-pr-9{% else %}m-pl-9{% endif %}">
+            <strong class="c-txt m-ff-lead-700 m-fs-5 m-ws-nowrap">
+                {{ persona.name }}
+            </strong>
+            {% for icon_name in persona.icons %%}
+                <span class="icon-{{ icon_name }} c-txt m-fs-5"></span>
+            {% endfor %}
+        </p>
+    </footer>
+</blockquote>

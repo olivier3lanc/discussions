@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  },
+  "dependencies": {
+    "@11ty/eleventy-fetch": "^4.0.0"
+  }
+}

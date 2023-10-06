@@ -1,0 +1,31 @@
+<!-- PAGE METADATA -->
+<title>{{ cms_page.title|default: title }} | {{ envmode }}</title>
+<meta name="description" content="{{ cms_page.description|default: description }}">
+
+<meta itemprop="name" content="{{ cms_page.title|default: title }}">
+<meta name="description" itemprop="description" content="{{ cms_page.description|default: description }}">
+<meta name="application-name" content="{{ cms_page.title|default: title }}">
+
+<!-- Microsoft -->
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="msapplication-tooltip" content="{{ cms_page.title|default: title }}">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ cms_page.title|default: title }}">
+<meta property="og:description" content="{{ cms_page.description|default: description }}">
+<meta property="og:image" content="{{ cms_page.image|default: image }}">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ cms_page.title|default: title }}">
+<meta name="twitter:description" content="{{ cms_page.description|default: description }}">
+<meta name="twitter:image" content="{{ cms_page.image|default: image }}">
+
+<!-- iOS -->
+<meta name="apple-mobile-web-app-title" content="{{ cms_page.title|default: title }}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- Android -->
+<meta name="color-scheme" content="light">
+<meta name="mobile-web-app-capable" content="yes">
