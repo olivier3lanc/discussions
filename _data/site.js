@@ -3,7 +3,7 @@ module.exports = function() {
     let baseurl = '/conversations/_site';
     const currentEnv = process.env.MY_ENVIRONMENT || "development";
     if (currentEnv == 'production') {
-        url = 'https://olivier3lanc.ovh';
+        url = 'https://unrivaled-dango-fdd77b.netlify.app';
         baseurl = ''
     }
     return {
