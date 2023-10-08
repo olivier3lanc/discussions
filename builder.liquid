@@ -49,18 +49,30 @@ permalink: "discussions/{{ cms_page.permalink }}"
 </head>
 
 <body>
-    
-    <main class="
-        c-dis m-flex m-column m-gap-8
-        c-dim m-maxw-3 m-m-auto m-p-10">
-        {% for content in cms_page.discussion %}
-            {%  render 'model_blockquote.liquid',
-                content: content,
-                personas: cms_fetch_personas,
-                site: site
-            %}
-        {% endfor %}
-    </main>
+    <div class="c-dis m-flex">
+        <nav>
+            <menu>
+                {% for cms_page in cms_fetch_pages %}
+                    <li>
+                        <a href="/discussions/{{ cms_page.permalink }}">
+                            {{ cms_page.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </menu>
+        </nav>
+        <main class="
+            c-dis m-flex m-column m-gap-8
+            c-dim m-maxw-3 m-m-auto m-p-10">
+            {% for content in cms_page.discussion %}
+                {%  render 'model_blockquote.liquid',
+                    content: content,
+                    personas: cms_fetch_personas,
+                    site: site
+                %}
+            {% endfor %}
+        </main>
+    </div>
 </body>
 
 </html>

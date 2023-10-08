@@ -1,8 +1,9 @@
 module.exports = function() {
     return {
         environment: process.env.MY_ENVIRONMENT || "development",
-        imgsrv: 'https://wsrv.nl/?&url=',
-        imgroot: 'https://olivier3lanc.ovh/cockpit/storage/uploads'
+        imgsrv: process.env.IMAGE_SERVER_ENDPOINT,
+        imgroot: process.env.SOURCES_IMAGES_ROOT,
+        api: process.env.COCKPIT_API_KEY
     };
 };
   
