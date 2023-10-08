@@ -7,4 +7,4 @@ _data/envlocal.json
 
 # Local Netlify folder
 .netlify
-.env
+.env.local
