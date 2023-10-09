@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- COMMON METADATA -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="msapplication-starturl" content="{{ page.url }}">
+    <meta property="og:url" content="{{ page.url }}">
+    <meta name="twitter:url" content="{{ page.url }}">
+
+    {%- render 'model_page_metadata',
+        title: 'Ajouter',
+        description: 'Ajouter une discussion',
+        image: 'https://og-image.vercel.app/discussions.png?theme=light&md=1&fontSize=140px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fhyper-color-logo.svg',
+        envmode: site.environment
+    -%}
+
+    <style>
+        /* retrait style <details> par défaut de iOS */
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        /* retrait style <button> et <select> par défaut de iOS */
+        select, button {
+            color: black
+        }
+    </style>
+    <link rel="stylesheet" href="/assets/css/briks_css_variables.css">
+    <link rel="stylesheet" href="/assets/css/briks_fonts.css">
+    <link rel="stylesheet" href="/assets/css/briks_dis_generic.css">
+    <link rel="stylesheet" href="/assets/css/briks_dis_extension.css">
+    <link rel="stylesheet" href="/assets/css/briks_dim_generic.css">
+    <link rel="stylesheet" href="/assets/css/briks_dim_extension.css">
+    <link rel="stylesheet" href="/assets/css/briks_pos_generic.css">
+    <link rel="stylesheet" href="/assets/css/briks_pos_extension.css">
+    <link rel="stylesheet" href="/assets/css/briks_txt_generic.css">
+    <link rel="stylesheet" href="/assets/css/briks_txt_extension.css">
+    <link rel="stylesheet" href="/assets/css/briks_skin_generic.css">
+    <link rel="stylesheet" href="/assets/css/briks_skin_extension.css">
+    <link rel="stylesheet" href="/assets/css/briks_utilities_generic.css">
+    <link rel="stylesheet" href="/assets/css/briks_html.css">
+    <link rel="stylesheet" href="/assets/fonts/icomoon/style.css">
+
+</head>
+
+<body>
+    
+    <main>
+        <h1>Add</h1>
+        <div class="c-dis m-flex m-gap-10">
+            <form>
+                <fieldset>
+                    <legend>Persona</legend>
+                    <label for="d_name">Persona Name</label>
+                    <input type="text" id="d_name">
+                </fieldset>
+                <fieldset>
+                    <legend>Message</legend>
+                    <label for="d_text">Message</label>
+                    <textarea id="d_text"></textarea>
+                </fieldset>
+                <fieldset>
+                    <legend>Alignement</legend>
+                    {% for alignment in site.alignment_values %}
+                        <input type="radio"
+                            id="d_alignment_{{ alignment }}"
+                            name="d_alignment" {% if forloop.first %}checked{% endif %}>
+                        <label for="d_alignment_{{ alignment }}">
+                            {{ alignment }}
+                        </label>
+                    {% endfor %}
+                </fieldset>
+                <fieldset>
+                    <legend>Theme color</legend>
+                    {% for theme_color in site.theme_color_values %}
+                        <input type="radio"
+                            id="d_theme_color_{{ theme_color }}"
+                            name="d_theme_color" {% if forloop.first %}checked{% endif %}>
+                        <label for="d_theme_color_{{ theme_color }}">
+                            {{ theme_color }}
+                        </label>
+                    {% endfor %}
+                </fieldset>
+                <button type="submit">Add</button>
+            </form>
+            <iframe srcdoc="<h1>qsdfqsdfqsd</h1>"></iframe>
+        </main>
+        <script>
+            const addPage = {
+
+                submit: function() {
+                    fetch(' https://olivier3lanc.ovh/cockpit/api/content/item/pages', {
+                        method: 'POST',
+                        headers: {
+                          "api-key": "API-c8dd49519bd457ba12944df55c2cb87b402d2868",
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            data: {
+                            
+                            }
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(response => console.log(response));
+                }
+            }
+        </script>
+    </main>
+</body>
+
+</html>
