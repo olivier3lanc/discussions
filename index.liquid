@@ -38,17 +38,213 @@
     <link rel="stylesheet" href="/assets/css/briks_skin_generic.css">
     <link rel="stylesheet" href="/assets/css/briks_skin_extension.css">
     <link rel="stylesheet" href="/assets/css/briks_utilities_generic.css">
-    <link rel="stylesheet" href="/assets/css/briks_html.css">
+    {% comment %} <link rel="stylesheet" href="/assets/css/briks_html.css"> {% endcomment %}
     <link rel="stylesheet" href="/assets/fonts/icomoon/style.css">
-
+    <style>
+        [required] + label::after {
+            content:"*";
+            color: red
+        }
+    </style>
 </head>
 
 <body>
-    
-    <main class="
-        c-dis m-flex m-column m-gap-8
-        c-dim m-maxw-3 m-m-auto m-p-10">
-        <h1>Titre</h1>
+    <main class="c-dim m-pl-10">
+        <h1>Page creator</h1>
+        <div class="c-dis m-flex m-gap-10">
+            <div class="c-dis m-flex m-column m-gap-6">
+                <details open="">
+                    <summary>Discussion / Page</summary>
+                    <form id="d_page_form">
+                        <fieldset>
+                            <legend>Language</legend>
+                            <div class="c-dis m-flex m-column">
+                                <select id="d_page_languages"
+                                    name="d_page_languages"
+                                    minlength="2"
+                                    maxlength="2"
+                                    required>
+                                    <option value="">-</option>
+                                    {% for language in parameters.page_languages %}
+                                        <option value="{{ language }}">
+                                            {{ language }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <label for="d_page_languages"
+                                    class="c-dim m-order--1">
+                                    Language used into the discusion
+                                </label>
+                                <div id="d_page_languages__error"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Title</legend>
+                            <div class="c-dis m-flex m-column">
+                                <input type="text"
+                                    id="d_page_title"
+                                    name="d_page_title"
+                                    required>
+                                <label for="d_page_title"
+                                    class="c-dim m-order--1">
+                                    Title of the discusion
+                                </label>
+                                <div id="d_page_title__error"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Description</legend>
+                            <div class="c-dis m-flex m-column">
+                                <input type="text"
+                                    id="d_page_description"
+                                    name="d_page_description">
+                                <label for="d_page_description"
+                                    class="c-dim m-order--1">
+                                    Description of the discusion
+                                </label>
+                                <div id="d_page_description__error"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Theme</legend>
+                            <div class="c-dis m-flex">
+                                {% for page_theme in parameters.page_themes %}
+                                    <div class="c-dis m-flex m-cross-center">
+                                        <input type="radio"
+                                            id="d_page_theme_{{ page_theme }}"
+                                            name="d_page_theme" 
+                                            value="{{ page_theme }}"
+                                            {% if forloop.first %}checked{% endif %}>
+                                        <label for="d_page_theme_{{ page_theme }}">
+                                            {{ page_theme }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <div id="d_page_theme__error"></div>
+                            </div>
+                        </fieldset>
+                        <button onclick="pageCreator._publish()">Publish</button>
+                    </form>
+                </details>
+                <details open="">
+                    <summary>Message</summary>
+                    <form id="d_message_form">
+                        <fieldset>
+                            <legend>Persona</legend>
+                            <div class="c-dis m-flex m-column">
+                                <input type="text"
+                                    id="d_message_persona_full_name"
+                                    name="d_message_persona_full_name"
+                                    required>
+                                <label for="d_message_persona_full_name"
+                                    class="c-dim m-order--1">
+                                    Full Name
+                                </label>
+                                <div id="d_message_persona_full_name__error"></div>
+                            </div>
+                            <div class="c-dis m-flex m-column">
+                                <input type="text"
+                                    id="d_message_persona_initials"
+                                    name="d_message_persona_initials">
+                                <label for="d_message_persona_initials"
+                                    class="c-dim m-order--1">
+                                    Initials
+                                </label>
+                                <div id="d_message_persona_initials__error"></div>
+                            </div>
+                            <fieldset class="c-dis m-flex m-column">
+                                <legend>Color</legend>
+                                <div class="c-dis m-flex m-gap-6">
+                                    {% for persona_color in parameters.persona_color_values %}
+                                        <div class="c-dis m-flex m-cross-center">
+                                            <input type="radio"
+                                                id="d_message_persona_color_{{ persona_color }}"
+                                                name="d_message_persona_color" 
+                                                value="{{ persona_color }}"
+                                                {% if forloop.first %}checked{% endif %}>
+                                            <label for="d_message_persona_color_{{ persona_color }}">
+                                                {{ persona_color }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                    <div id="d_message_persona_color__error"></div>
+                                </div>
+                            </fieldset>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Message</legend>
+                            <div class="c-dis m-flex m-column">
+                                <textarea id="d_message_text"
+                                    name="d_message_text"
+                                    minlength="1"
+                                    maxlength="512"
+                                    required></textarea>
+                                <label for="d_message_text"
+                                    class="c-dim m-order--1">
+                                    Message
+                                </label>
+                                <div id="d_message_text__error"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Alignement</legend>
+                            <div class="c-dis m-flex m-gap-6">
+                                {% for alignment in parameters.alignment_values %}
+                                    <div class="c-dis m-flex m-cross-center">
+                                        <input type="radio"
+                                            id="d_message_alignment_{{ alignment }}"
+                                            name="d_message_alignment" 
+                                            value="{{ alignment }}" {% if forloop.first %}checked{% endif %}>
+                                        <label for="d_message_alignment_{{ alignment }}">
+                                            {{ alignment }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <div id="d_message_alignment__error"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Theme color</legend>
+                            <div class="c-dis m-flex m-gap-6">
+                                {% for theme_color in parameters.theme_color_values %}
+                                    <div class="c-dis m-flex m-cross-center">
+                                        <input type="radio"
+                                            id="d_message_theme_color_{{ theme_color }}"
+                                            name="d_message_theme_color" 
+                                            value="{{ theme_color }}" {% if forloop.first %}checked{% endif %}>
+                                        <label for="d_message_theme_color_{{ theme_color }}">
+                                            {{ theme_color }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <div id="d_message_theme_color__error"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Presets</legend>
+                            <div class="c-dis m-flex m-gap-6">
+                                {% for persona_preset in parameters.persona_preset_values %}
+                                    <div class="c-dis m-flex m-cross-center">
+                                        <input type="radio"
+                                            id="d_message_persona_preset_{{ persona_preset }}"
+                                            name="d_message_persona_preset" 
+                                            value="{{ persona_preset }}" {% if forloop.first %}checked{% endif %}>
+                                        <label for="d_message_persona_preset_{{ persona_preset }}">
+                                            {{ persona_preset }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <div id="d_message_persona_preset__error"></div>
+                            </div>
+                        </fieldset>
+                        <button onclick="pageCreator.addMessage()">Add</button>
+                    </form>
+
+                </details>
+            </div>
+            <iframe class="c-dim m-grow" id="el_previewer" srcdoc="<h1>qsdfqsdfqsd</h1>"></iframe>
+        </div>
+        <h2>Pages</h2>
         <ul>
             {% for cms_page in cms_fetch_pages %}
                 <li>
@@ -59,6 +255,8 @@
             {% endfor %}
         </ul>
     </main>
+
+    <script src="/assets/js/page-creator.js"></script>
 </body>
 
 </html>

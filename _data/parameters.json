@@ -1,0 +1,8 @@
+{
+    "theme_color_values": ["grey", "blue", "green", "orange", "red"],
+    "persona_color_values": ["grey", "blue", "green", "orange", "red"],
+    "alignment_values": ["left", "right"],
+    "page_languages": ["en", "fr", "es", "it", "pt", "nl", "ro", "ru"],
+    "page_themes": ["default"],
+    "persona_preset_values": ["anger", "love", "joy"]
+}
