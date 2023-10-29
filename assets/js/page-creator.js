@@ -46,6 +46,7 @@ const pageCreator = {
             });
             this._messages.push(current_message);
             console.log(this._messages);
+            this.buildPage({messages: this._messages});
         } else {
             console.log("message is not postable, check forms");
         }
@@ -125,7 +126,6 @@ const pageCreator = {
         } else {
             alert(data.error)
         }
-        // el_previewer.contentWindow.document.body = 
     },
     localStorageAvailable: function() {
         let storage;
