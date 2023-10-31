@@ -30,11 +30,13 @@ const pageCreator = {
         this._formdata_d_message_fields.forEach(function(field) {
             const el_input_form = document.querySelector(`[name="${field}"]`);
             const el_error_display = document.querySelector(`#${field}__error`);
-            if (el_input_form.checkValidity()) {
-                el_error_display.innerHTML = "";
-            } else {
-                el_error_display.innerHTML = "error";
-                message_is_postable = false;
+            if (el_error_display !== null) {
+                if (el_input_form.checkValidity()) {
+                    el_error_display.innerHTML = "";
+                } else {
+                    el_error_display.innerHTML = "error";
+                    message_is_postable = false;
+                }
             }
         });
         // If message is postable
@@ -47,6 +49,7 @@ const pageCreator = {
             this._messages.push(current_message);
             console.log(this._messages);
             this.buildPage({messages: this._messages});
+            this.addPersonaPreset();
         } else {
             console.log("message is not postable, check forms");
         }
@@ -151,6 +154,29 @@ const pageCreator = {
                 storage &&
                 storage.length !== 0
             );
+        }
+    },
+    addPersonaPreset: function() {
+        const current_value = document.querySelector('input[name="d_message_persona_preset"]:checked').value;
+        // const el_input_with_current_value = d_message_persona_presets_container.querySelector(`input[value="${value}"]`);
+        // console.log(value, el_input_with_current_value);
+        if (current_value == 'new') {
+            const index = d_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
+            const new_value = d_message_persona_full_name.value;
+            if (d_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
+                const markup = `
+                    <div class="c-dis m-flex m-cross-center">
+                        <input type="radio"
+                            id="d_message_persona_preset_${index}"
+                            name="d_message_persona_preset" 
+                            value="${new_value}">
+                        <label for="d_message_persona_preset_${index}">
+                            ${new_value}
+                        </label>
+                    </div>
+                `;
+                d_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
+            }
         }
     }
 };
