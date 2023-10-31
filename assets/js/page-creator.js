@@ -51,7 +51,7 @@ const pageCreator = {
             console.log("message is not postable, check forms");
         }
     },
-    _publish: function() {
+    publish: function() {
         // Adding a page is enabled
         let page_is_publishable = true;
         // Init pages related fields
