@@ -30,13 +30,13 @@ const pageCreator = {
         this._formdata_d_message_fields.forEach(function(field) {
             const el_input_form = document.querySelector(`[name="${field}"]`);
             const el_error_display = document.querySelector(`#${field}__error`);
+            let error_html = '';
+            if (!el_input_form.checkValidity()) {
+                message_is_postable = false;
+                error_html = 'error';
+            }
             if (el_error_display !== null) {
-                if (el_input_form.checkValidity()) {
-                    el_error_display.innerHTML = "";
-                } else {
-                    el_error_display.innerHTML = "error";
-                    message_is_postable = false;
-                }
+                el_error_display.innerHTML = error_html;
             }
         });
         // If message is postable
