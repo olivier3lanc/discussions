@@ -1,4 +1,14 @@
 const pageCreator = {
+    el_page_form: document.getElementById('d_page_form'),
+    el_message_form: document.getElementById('d_message_form'),
+    el_page_languages: document.getElementById('d_page_languages'),
+    el_page_title: document.getElementById('d_page_title'),
+    el_page_description: document.getElementById('d_page_description'),
+    el_message_persona_presets_container: document.getElementById('d_message_persona_presets_container'),
+    el_message_persona_preset_new: document.getElementById('d_message_persona_preset_new'),
+    el_message_persona_full_name: document.getElementById('d_message_persona_full_name'),
+    el_message_text: document.getElementById('d_message_text'),
+    el_previewer: document.getElementById('d_previewer'),
     _messages: [],
     _handlers: {
         _onSubmitFormPage: function(evt) {
@@ -10,28 +20,38 @@ const pageCreator = {
             pageCreator.addMessage();
         },
         _onClickPersonaNew: function(evt) {
-            d_message_persona_full_name.disabled = false;
+            pageCreator.el_message_persona_full_name.disabled = false;
+            pageCreator.el_message_persona_full_name.focus();
         },
         _onClickPersonaPreset: function(evt) {
-            d_message_persona_full_name.disabled = true;
+            pageCreator.el_message_persona_full_name.disabled = true;
+            pageCreator.el_message_text.focus();
         },
         _fetchPageResponse: function(response, id) {
             console.log(response,id);
             pageCreator._messages = response.messages;
             pageCreator.buildPage();
+        },
+        _onTextareaEnter(evt) {
+            if (evt.which === 13) {
+                if (!evt.repeat) {
+                    const newEvent = new Event("submit", {cancelable: true});
+                    evt.target.form.dispatchEvent(newEvent);
+                }
+                evt.preventDefault(); // Prevents the addition of a new line in the text field
+            }
         }
     },
     addMessage: function() {
         // Init message related fields
         pageCreator._formdata_d_message_fields = [];
-        pageCreator.el_form_d_message = document.querySelector("#d_message_form");
-        if (pageCreator.el_form_d_message !== null) {
-            pageCreator.el_form_d_message.addEventListener(
+        if (pageCreator.el_message_form !== null) {
+            pageCreator.el_message_form.addEventListener(
                 "submit",
                 this._handlers._onSubmitFormMessage
             );
         }
-        pageCreator.formdata_d_message = new FormData(pageCreator.el_form_d_message);
+        pageCreator.formdata_d_message = new FormData(pageCreator.el_message_form);
         // Get all message fields names and store them into an array
         for (let key of pageCreator.formdata_d_message.keys()) {
             pageCreator._formdata_d_message_fields.push(key);
@@ -79,7 +99,8 @@ const pageCreator = {
                 }
                 localStorage.setItem("discussion", JSON.stringify(backup));
             }
-            d_message_text.value = '';
+            pageCreator.el_message_text.value = '';
+            pageCreator.el_message_persona_full_name.focus();
         } else {
             console.log("message is not postable, check forms");
         }
@@ -90,7 +111,7 @@ const pageCreator = {
         // Init pages related fields
         pageCreator._formdata_d_page_fields = [];
 
-        pageCreator.formdata_d_page = new FormData(d_page_form);
+        pageCreator.formdata_d_page = new FormData(pageCreator.el_page_form);
         // Get all page fields names and store them into an array
         for (var key of pageCreator.formdata_d_page.keys()) {
             pageCreator._formdata_d_page_fields.push(key);
@@ -147,11 +168,11 @@ const pageCreator = {
             markup += `
                 <p>
                     ${el.d_message_text}<br>
-                    <button onclick="window.parent.pc.remove('${index}')">remove</button>
+                    <button onclick="window.parent.pageCreator.removeMessage('${index}')">remove</button>
                 </p>
             `;
         });
-        el_previewer.contentWindow.document.body.innerHTML = markup;
+        this.el_previewer.contentWindow.document.body.innerHTML = markup;
     },
     localStorageAvailable: function() {
         let storage;
@@ -182,16 +203,16 @@ const pageCreator = {
     addPersonaPreset: function() {
         const current_value = document.querySelector('input[name="d_message_persona_preset"]:checked').value;
         if (current_value == 'new') {
-            d_message_persona_full_name.disabled = false;
-            const index = d_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
-            const new_value = d_message_persona_full_name.value;
-            if (d_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
+            pageCreator.el_message_persona_full_name.disabled = false;
+            const index = pageCreator.el_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
+            const new_value = pageCreator.el_message_persona_full_name.value;
+            if (pageCreator.el_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
                 const markup = this.renderCustomPersonaPreset(`d_message_persona_preset_${index}`, new_value);
-                d_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
-                d_message_persona_full_name.value = '';
+                pageCreator.el_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
+                pageCreator.el_message_persona_full_name.value = '';
             }
         } else {
-            d_message_persona_full_name.disabled = true;
+            pageCreator.el_message_persona_full_name.disabled = true;
         }
     },
     renderCustomPersonaPreset: function(id, value) {
@@ -217,7 +238,7 @@ const pageCreator = {
             restoration_data.custom_personas.forEach(function(data) {
                 persona_presets_markup += pageCreator.renderCustomPersonaPreset(data.id, data.value);
             });
-            d_message_persona_presets_container.insertAdjacentHTML('beforeend', persona_presets_markup);
+            this.el_message_persona_presets_container.insertAdjacentHTML('beforeend', persona_presets_markup);
 
             // Restore messages
             this._messages = restoration_data.messages;
@@ -230,12 +251,14 @@ const pageCreator = {
         }
     }
 };
-d_page_form.addEventListener('submit', pageCreator._handlers._onSubmitFormPage);
-d_message_form.addEventListener('submit', pageCreator._handlers._onSubmitFormMessage);
-d_message_persona_preset_new.addEventListener('click', pageCreator._handlers._onClickPersonaNew);
+pageCreator.el_page_form.addEventListener('submit', pageCreator._handlers._onSubmitFormPage);
+pageCreator.el_message_form.addEventListener('submit', pageCreator._handlers._onSubmitFormMessage);
+pageCreator.el_message_persona_preset_new.addEventListener('click', pageCreator._handlers._onClickPersonaNew);
+pageCreator.el_message_text.addEventListener("keydown", pageCreator._handlers._onTextareaEnter);
 pageCreator.restore();
-window.pc = {
-    remove: function(index) {
+
+window.pageCreator = {
+    removeMessage: function(index) {
         index = parseInt(index);
         pageCreator._messages.splice(index, 1);
         pageCreator.buildPage();
