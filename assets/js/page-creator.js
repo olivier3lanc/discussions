@@ -1,4 +1,5 @@
 const pageCreator = {
+    // DOM elements
     el_page_form: document.getElementById('d_page_form'),
     el_message_form: document.getElementById('d_message_form'),
     el_page_languages: document.getElementById('d_page_languages'),
@@ -9,7 +10,9 @@ const pageCreator = {
     el_message_persona_full_name: document.getElementById('d_message_persona_full_name'),
     el_message_text: document.getElementById('d_message_text'),
     el_previewer: document.getElementById('d_previewer'),
+    // Temp array for messages
     _messages: [],
+    // Event handlers
     _handlers: {
         _onSubmitFormPage: function(evt) {
             evt.preventDefault();
@@ -27,11 +30,17 @@ const pageCreator = {
             pageCreator.el_message_persona_full_name.disabled = true;
             pageCreator.el_message_text.focus();
         },
+        _onClickRemovePersonaPreset: function(evt) {
+            evt.preventDefault();
+            evt.target.closest('div').remove();
+        },
         _fetchPageResponse: function(response, id) {
             console.log(response,id);
             pageCreator._messages = response.messages;
             pageCreator.buildPage();
         },
+        // Make "Enter" key in a textarea submit a form
+        // https://stackoverflow.com/a/49389811
         _onTextareaEnter(evt) {
             if (evt.which === 13) {
                 if (!evt.repeat) {
@@ -42,22 +51,23 @@ const pageCreator = {
             }
         }
     },
+    // Submit message form 
+    // Prepare publish
+    // Update preview
     addMessage: function() {
         // Init message related fields
         pageCreator._formdata_d_message_fields = [];
         if (pageCreator.el_message_form !== null) {
-            pageCreator.el_message_form.addEventListener(
-                "submit",
-                this._handlers._onSubmitFormMessage
-            );
+            pageCreator.el_message_form.addEventListener('submit', this._handlers._onSubmitFormMessage);
         }
+        // Get form data
         pageCreator.formdata_d_message = new FormData(pageCreator.el_message_form);
         // Get all message fields names and store them into an array
         for (let key of pageCreator.formdata_d_message.keys()) {
             pageCreator._formdata_d_message_fields.push(key);
         }
         // Adding a message is authorized
-        // before validity check
+        // unless invalid field
         let message_is_postable = true;
         // Check validity for message fields
         this._formdata_d_message_fields.forEach(function(field) {
@@ -77,7 +87,9 @@ const pageCreator = {
         if (message_is_postable) {
             const current_message = {};
             this._formdata_d_message_fields.forEach(function(name) {
-                current_message[name] = pageCreator.formdata_d_message.get(name);
+                const field_value = pageCreator.formdata_d_message.get(name);
+                const sanitized_value = pageCreator.stripHTML(field_value);
+                current_message[name] = sanitized_value;
             });
             this._messages.push(current_message);
             // console.log(this._messages);
@@ -162,17 +174,24 @@ const pageCreator = {
                 .catch((err) => console.error(err));
         }
     },
+    stripHTML: function(string) {
+        return string.replace(/(<([^>]+)>)/gi, "");
+    },
     buildPage: function() {
         let markup = '';
-        pageCreator._messages.forEach(function(el, index) {
+        pageCreator._messages.forEach(function(mess, index) {
             markup += `
                 <p>
-                    ${el.d_message_text}<br>
+                    ${pageCreator.stripHTML(mess.d_message_text)}<br>
+                    <cite>- ${pageCreator.stripHTML(mess.d_message_persona_full_name || mess.d_message_persona_preset)}</cite><br>
                     <button onclick="window.parent.pageCreator.removeMessage('${index}')">remove</button>
                 </p>
             `;
         });
+        // Insert messages markup
         this.el_previewer.contentWindow.document.body.innerHTML = markup;
+        // scroll to the last message
+        this.el_previewer.contentWindow.document.querySelector('p:last-child').scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
     },
     localStorageAvailable: function() {
         let storage;
@@ -205,7 +224,8 @@ const pageCreator = {
         if (current_value == 'new') {
             pageCreator.el_message_persona_full_name.disabled = false;
             const index = pageCreator.el_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
-            const new_value = pageCreator.el_message_persona_full_name.value;
+            const raw_value = pageCreator.el_message_persona_full_name.value;
+            const new_value = pageCreator.stripHTML(raw_value);
             if (pageCreator.el_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
                 const markup = this.renderCustomPersonaPreset(`d_message_persona_preset_${index}`, new_value);
                 pageCreator.el_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
@@ -217,16 +237,20 @@ const pageCreator = {
     },
     renderCustomPersonaPreset: function(id, value) {
         return `
-            <div class="c-dis m-flex m-cross-center">
+            <div class="
+                c-dis m-flex m-cross-center
+                c-pos m-relative">
                 <input type="radio"
                     id="${id}"
                     name="d_message_persona_preset" 
                     value="${value}"
                     class="d_message_persona_custom_preset"
                     onclick="pageCreator._handlers._onClickPersonaPreset()">
-                <label for="${id}">
-                    ${value}
-                </label>
+                <label for="${id}">${value}</label>
+                <button class="c-pos m-absolute m-bottom-100"
+                    onclick="pageCreator._handlers._onClickRemovePersonaPreset(event)">
+                    remove
+                </button>
             </div>
         `;
     },
