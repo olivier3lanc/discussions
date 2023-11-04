@@ -10,6 +10,8 @@ const pageCreator = {
     el_message_persona_full_name: document.getElementById('d_message_persona_full_name'),
     el_message_text: document.getElementById('d_message_text'),
     el_previewer: document.getElementById('d_previewer'),
+    el_cmd_set_bold: document.getElementById('cmd_set_bold'),
+    el_cmd_set_italic: document.getElementById('cmd_set_italic'),
     // Temp array for messages
     _messages: [],
     // Event handlers
@@ -52,6 +54,16 @@ const pageCreator = {
                 }
                 evt.preventDefault(); // Prevents the addition of a new line in the text field
             }
+        },
+        _onClickWrapMarkdown: function(evt) {
+            const start = pageCreator.el_message_text.selectionStart;
+            const end = pageCreator.el_message_text.selectionEnd;
+            if (start == end) {
+                return; // nothing is selected
+            }
+            const markdown = evt.target.dataset.markdown;
+            const selected = pageCreator.el_message_text.value.slice(start, end);
+            pageCreator.el_message_text.setRangeText(`${markdown}${selected}${markdown}`);
         }
     },
     // Submit message form 
@@ -117,7 +129,7 @@ const pageCreator = {
     customParseReverse: function(string) {
         const toHTML = string
             .replace(/<strong>(.*)<\/strong>/gim, '**$1**') // bold text
-            .replace(/<em>(.*)<\/em>/gim, '**$1**'); // italic text
+            .replace(/<em>(.*)<\/em>/gim, '*$1*'); // italic text
 	    return toHTML.trim(); // using trim method to remove whitespace
     },
     publish: function() {
@@ -237,18 +249,18 @@ const pageCreator = {
             el_input_new_persona.checked = true;
         }
         if (el_input_new_persona.checked) {
-            pageCreator.el_message_persona_full_name.disabled = false;
-            const index = pageCreator.el_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
-            const raw_value = pageCreator.el_message_persona_full_name.value;
-            const sanitized_value = pageCreator.stripHTML(raw_value);
-            const new_value = pageCreator.customParse(sanitized_value);
-            if (pageCreator.el_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
+            this.el_message_persona_full_name.disabled = false;
+            const index = this.el_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
+            const raw_value = this.el_message_persona_full_name.value;
+            const sanitized_value = this.stripHTML(raw_value);
+            const new_value = this.customParse(sanitized_value);
+            if (this.el_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
                 const markup = this.renderCustomPersonaPreset(`d_message_persona_preset_${index}`, new_value);
-                pageCreator.el_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
-                pageCreator.el_message_persona_full_name.value = '';
+                this.el_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
+                this.el_message_persona_full_name.value = '';
             }
         } else {
-            pageCreator.el_message_persona_full_name.disabled = true;
+            this.el_message_persona_full_name.disabled = true;
         }
     },
     renderCustomPersonaPreset: function(id, value) {
@@ -378,6 +390,8 @@ pageCreator.el_page_form.addEventListener('submit', pageCreator._handlers._onSub
 pageCreator.el_message_form.addEventListener('submit', pageCreator._handlers._onSubmitFormMessage);
 pageCreator.el_message_persona_preset_new.addEventListener('click', pageCreator._handlers._onClickPersonaNew);
 pageCreator.el_message_text.addEventListener("keydown", pageCreator._handlers._onTextareaEnter);
+pageCreator.el_cmd_set_bold.addEventListener("click", pageCreator._handlers._onClickWrapMarkdown);
+pageCreator.el_cmd_set_italic.addEventListener("click", pageCreator._handlers._onClickWrapMarkdown);
 pageCreator.restore();
 
 window.pageCreator = {
