@@ -89,7 +89,8 @@ const pageCreator = {
             this._formdata_d_message_fields.forEach(function(name) {
                 const field_value = pageCreator.formdata_d_message.get(name);
                 const sanitized_value = pageCreator.stripHTML(field_value);
-                current_message[name] = sanitized_value;
+                const parsed_markdown = pageCreator.customParse(sanitized_value);
+                current_message[name] = parsed_markdown;
             });
             this._messages.push(current_message);
             console.log(this._messages);
@@ -101,6 +102,23 @@ const pageCreator = {
         } else {
             console.log("message is not postable, check forms");
         }
+    },
+    customParse: function(string) {
+        // Source
+        // https://randyperkins2k.medium.com/writing-a-simple-markdown-parser-using-javascript-1f2e9449a558
+        const toHTML = string
+            // .replace(/^### (.*$)/gim, '<h3>$1</h3>') // h3 tag
+            // .replace(/^## (.*$)/gim, '<h2>$1</h2>') // h2 tag
+            // .replace(/^# (.*$)/gim, '<h1>$1</h1>') // h1 tag
+            .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>') // bold text
+            .replace(/\*(.*)\*/gim, '<em>$1</em>'); // italic text
+	    return toHTML.trim(); // using trim method to remove whitespace
+    },
+    customParseReverse: function(string) {
+        const toHTML = string
+            .replace(/<strong>(.*)<\/strong>/gim, '**$1**') // bold text
+            .replace(/<em>(.*)<\/em>/gim, '**$1**'); // italic text
+	    return toHTML.trim(); // using trim method to remove whitespace
     },
     publish: function() {
         // Adding a page is enabled
@@ -169,8 +187,8 @@ const pageCreator = {
         pageCreator._messages.forEach(function(mess, index) {
             markup += `
                 <p data-message="" data-message_alignment="${mess.d_message_alignment}" data-message_variant="${mess.d_message_variant}">
-                    <span data-message_text="">${pageCreator.stripHTML(mess.d_message_text)}</span><br>
-                    <cite data-message_persona="">${pageCreator.stripHTML(mess.d_message_persona_full_name || mess.d_message_persona_preset)}</cite><br>
+                    <span data-message_text="">${mess.d_message_text}</span><br>
+                    <cite data-message_persona="">${mess.d_message_persona_full_name || mess.d_message_persona_preset}</cite><br>
                     <button class="cmd_remove_message" onclick="window.parent.pageCreator.removeMessage('${index}')">remove</button>
                     <button class="cmd_edit_message" onclick="window.parent.pageCreator.editMessage('${index}')">edit</button>
                 </p>
@@ -222,7 +240,8 @@ const pageCreator = {
             pageCreator.el_message_persona_full_name.disabled = false;
             const index = pageCreator.el_message_persona_presets_container.querySelectorAll(`input[type="radio"]`).length + 1;
             const raw_value = pageCreator.el_message_persona_full_name.value;
-            const new_value = pageCreator.stripHTML(raw_value);
+            const sanitized_value = pageCreator.stripHTML(raw_value);
+            const new_value = pageCreator.customParse(sanitized_value);
             if (pageCreator.el_message_persona_presets_container.querySelector(`input[value="${new_value}"]`) == null) {
                 const markup = this.renderCustomPersonaPreset(`d_message_persona_preset_${index}`, new_value);
                 pageCreator.el_message_persona_presets_container.insertAdjacentHTML('beforeend', markup);
@@ -311,6 +330,8 @@ const pageCreator = {
         const el_to_edit = pageCreator.el_previewer.contentWindow.document.querySelectorAll('[data-message]')[index];
         const el_message = el_to_edit.querySelector('[data-message_text]');
         const el_persona = el_to_edit.querySelector('[data-message_persona]');
+        el_message.innerHTML = pageCreator.customParseReverse(el_message.innerHTML);
+        el_persona.innerHTML = pageCreator.customParseReverse(el_persona.innerHTML);
         el_message.contentEditable = true;
         el_persona.contentEditable = true;
         let commands_markup = '';
@@ -342,8 +363,10 @@ const pageCreator = {
         const el_new_persona = el_to_edit.querySelector('[data-message_persona]');
         el_new_message.contentEditable = false;
         el_new_persona.contentEditable = false;
-        const new_message = pageCreator.stripHTML(el_new_message.innerHTML);
-        const new_persona = pageCreator.stripHTML(el_new_persona.innerHTML);
+        const new_sanitized_message = pageCreator.stripHTML(el_new_message.innerHTML);
+        const new_sanitized_persona = pageCreator.stripHTML(el_new_persona.innerHTML);
+        const new_message = pageCreator.customParse(new_sanitized_message);
+        const new_persona = pageCreator.customParse(new_sanitized_persona);
         pageCreator._messages[index]['d_message_persona_full_name'] = new_persona;
         pageCreator._messages[index]['d_message_text'] = new_message;
         pageCreator._messages[index]['d_message_alignment'] = el_to_edit.querySelector(`[name="cmd_${index}_alignment"]:checked`).value;
