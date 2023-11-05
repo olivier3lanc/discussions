@@ -68,14 +68,15 @@ const pageCreator = {
             pageCreator.el_message_text.setRangeText(`${markdown}${selected}${markdown}`);
         }
     },
-    // wrapSelectedText: function() {
-    //     const sel = this.el_previewer.contentWindow.window.getSelection();
-    //     if (sel.rangeCount) {
-    //         range = sel.getRangeAt(0);
-    //         const selectedText = range.extractContents();
-    //         range.insertNode(document.createTextNode(`**${selectedText.textContent}**`));
-    //     }
-    // },
+    wrapSelectedText: function(markdown = '') {
+        const selection = this.el_previewer.contentWindow.window.getSelection();
+        if (selection.rangeCount) {
+            const range = selection.getRangeAt(0);
+            const selected_text_obj = range.extractContents();
+            const selected_text = selected_text_obj.textContent;
+            range.insertNode(document.createTextNode(`${markdown}${selected_text}${markdown}`));
+        }
+    },
     // Submit message form 
     // Prepare publish
     // Update preview
@@ -128,21 +129,21 @@ const pageCreator = {
     customParse: function(string) {
         // Source
         // https://randyperkins2k.medium.com/writing-a-simple-markdown-parser-using-javascript-1f2e9449a558
-        const toHTML = string
+        const to_HTML = string
             // .replace(/^### (.*$)/gim, '<h3>$1</h3>') // h3 tag
             // .replace(/^## (.*$)/gim, '<h2>$1</h2>') // h2 tag
             // .replace(/^# (.*$)/gim, '<h1>$1</h1>') // h1 tag
             .replace(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/, `<a href="$1" target="_blank">$1</a>`)
             .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>') // bold text
             .replace(/\*(.*)\*/gim, '<em>$1</em>'); // italic text
-	    return toHTML.trim(); // using trim method to remove whitespace
+	    return to_HTML.trim(); // using trim method to remove whitespace
     },
     customParseReverse: function(string) {
-        const toPlainText = string
+        const to_plain_text = string
             .replace(/<a.*>(.*)<\/a>/ig, '$1') // Link
             .replace(/<strong>(.*)<\/strong>/gim, '**$1**') // bold text
             .replace(/<em>(.*)<\/em>/gim, '*$1*'); // italic text
-	    return toPlainText.trim(); // using trim method to remove whitespace
+	    return to_plain_text.trim(); // using trim method to remove whitespace
     },
     publish: function() {
         // Adding a page is enabled
