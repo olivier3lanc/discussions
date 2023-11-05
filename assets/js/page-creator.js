@@ -55,6 +55,8 @@ const pageCreator = {
                 evt.preventDefault(); // Prevents the addition of a new line in the text field
             }
         },
+        // source
+        // https://javascript.info/selection-range
         _onClickWrapMarkdown: function(evt) {
             const start = pageCreator.el_message_text.selectionStart;
             const end = pageCreator.el_message_text.selectionEnd;
@@ -66,6 +68,14 @@ const pageCreator = {
             pageCreator.el_message_text.setRangeText(`${markdown}${selected}${markdown}`);
         }
     },
+    // wrapSelectedText: function() {
+    //     const sel = this.el_previewer.contentWindow.window.getSelection();
+    //     if (sel.rangeCount) {
+    //         range = sel.getRangeAt(0);
+    //         const selectedText = range.extractContents();
+    //         range.insertNode(document.createTextNode(`**${selectedText.textContent}**`));
+    //     }
+    // },
     // Submit message form 
     // Prepare publish
     // Update preview
@@ -122,15 +132,17 @@ const pageCreator = {
             // .replace(/^### (.*$)/gim, '<h3>$1</h3>') // h3 tag
             // .replace(/^## (.*$)/gim, '<h2>$1</h2>') // h2 tag
             // .replace(/^# (.*$)/gim, '<h1>$1</h1>') // h1 tag
+            .replace(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/, `<a href="$1" target="_blank">$1</a>`)
             .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>') // bold text
             .replace(/\*(.*)\*/gim, '<em>$1</em>'); // italic text
 	    return toHTML.trim(); // using trim method to remove whitespace
     },
     customParseReverse: function(string) {
-        const toHTML = string
+        const toPlainText = string
+            .replace(/<a.*>(.*)<\/a>/ig, '$1') // Link
             .replace(/<strong>(.*)<\/strong>/gim, '**$1**') // bold text
             .replace(/<em>(.*)<\/em>/gim, '*$1*'); // italic text
-	    return toHTML.trim(); // using trim method to remove whitespace
+	    return toPlainText.trim(); // using trim method to remove whitespace
     },
     publish: function() {
         // Adding a page is enabled
