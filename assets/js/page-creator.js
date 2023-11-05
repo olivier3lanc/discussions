@@ -10,8 +10,6 @@ const pageCreator = {
     el_message_persona_full_name: document.getElementById('d_message_persona_full_name'),
     el_message_text: document.getElementById('d_message_text'),
     el_previewer: document.getElementById('d_previewer'),
-    el_cmd_set_bold: document.getElementById('cmd_set_bold'),
-    el_cmd_set_italic: document.getElementById('cmd_set_italic'),
     // Temp array for messages
     _messages: [],
     // Event handlers
@@ -66,17 +64,23 @@ const pageCreator = {
             const markdown = evt.target.dataset.markdown;
             const selected = pageCreator.el_message_text.value.slice(start, end);
             pageCreator.el_message_text.setRangeText(`${markdown}${selected}${markdown}`);
+        },
+        _onDoubleClickMessage: function(evt) {
+            function getChildElementIndex(node) {
+                return Array.prototype.indexOf.call(node.parentNode.children, node) - 1;
+              }
+            console.log(getChildElementIndex(evt.target.closest('[data-message]')));
         }
     },
-    wrapSelectedText: function(markdown = '') {
-        const selection = this.el_previewer.contentWindow.window.getSelection();
-        if (selection.rangeCount) {
-            const range = selection.getRangeAt(0);
-            const selected_text_obj = range.extractContents();
-            const selected_text = selected_text_obj.textContent;
-            range.insertNode(document.createTextNode(`${markdown}${selected_text}${markdown}`));
-        }
-    },
+    // wrapSelectedText: function(markdown = '') {
+    //     const selection = this.el_previewer.contentWindow.window.getSelection();
+    //     if (selection.rangeCount) {
+    //         const range = selection.getRangeAt(0);
+    //         const selected_text_obj = range.extractContents();
+    //         const selected_text = selected_text_obj.textContent;
+    //         range.insertNode(document.createTextNode(`${markdown}${selected_text}${markdown}`));
+    //     }
+    // },
     // Submit message form 
     // Prepare publish
     // Update preview
@@ -222,6 +226,10 @@ const pageCreator = {
         const el_previewer_document = this.el_previewer.contentWindow.document;
         // Insert messages markup
         el_previewer_document.body.innerHTML = markup;
+        // Edit mode on double click on message
+        el_previewer_document.querySelectorAll('[data-message]').forEach(function(el) {
+            el.addEventListener('dblclick', pageCreator._handlers._onDoubleClickMessage);
+        })
         // scroll to the last message
         // const el_last_message = el_previewer_document.querySelector('p:last-child');
         // if (el_last_message !== null) {
@@ -355,8 +363,15 @@ const pageCreator = {
         const el_to_edit = pageCreator.el_previewer.contentWindow.document.querySelectorAll('[data-message]')[index];
         const el_message = el_to_edit.querySelector('[data-message_text]');
         const el_persona = el_to_edit.querySelector('[data-message_persona]');
+        const handler_on_enter_key = function(evt) {
+            if (evt.which === 13) {
+                window.parent.pageCreator.saveMessage(index)
+            }
+        }
         el_message.innerHTML = pageCreator.customParseReverse(el_message.innerHTML);
+        el_message.addEventListener('keydown', handler_on_enter_key);
         el_persona.innerHTML = pageCreator.customParseReverse(el_persona.innerHTML);
+        el_persona.addEventListener('keydown', handler_on_enter_key);
         el_message.contentEditable = true;
         el_persona.contentEditable = true;
         let commands_markup = '';
@@ -397,14 +412,13 @@ const pageCreator = {
         pageCreator._messages[index]['d_message_alignment'] = el_to_edit.querySelector(`[name="cmd_${index}_alignment"]:checked`).value;
         pageCreator._messages[index]['d_message_variant'] = el_to_edit.querySelector(`[name="cmd_${index}_variant"]:checked`).value;
         pageCreator.buildPage();
+        pageCreator.save();
     }
 };
 pageCreator.el_page_form.addEventListener('submit', pageCreator._handlers._onSubmitFormPage);
 pageCreator.el_message_form.addEventListener('submit', pageCreator._handlers._onSubmitFormMessage);
 pageCreator.el_message_persona_preset_new.addEventListener('click', pageCreator._handlers._onClickPersonaNew);
 pageCreator.el_message_text.addEventListener("keydown", pageCreator._handlers._onTextareaEnter);
-pageCreator.el_cmd_set_bold.addEventListener("click", pageCreator._handlers._onClickWrapMarkdown);
-pageCreator.el_cmd_set_italic.addEventListener("click", pageCreator._handlers._onClickWrapMarkdown);
 pageCreator.restore();
 
 window.pageCreator = {
