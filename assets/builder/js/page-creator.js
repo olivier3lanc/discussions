@@ -1,3 +1,10 @@
+const pageThemesResources = {
+    default: {
+        css: ['preview'],
+        js_head: ['foo'],
+        js_body: ['bar']
+    }
+}
 const pageCreator = {
     // DOM elements
     el_page_form: document.getElementById('d_page_form'),
@@ -213,9 +220,24 @@ const pageCreator = {
         return string.replace(/(<([^>]+)>)/gi, "");
     },
     buildPage: function() {
-        let markup = `
-            <link rel="stylesheet" href="/assets/css/preview.css">
-        `;
+        const el_input_current_template = document.querySelector('[name="d_page_theme"]:checked');
+        let theme_name = 'default';
+        if (el_input_current_template !== null) {
+            theme_name = el_input_current_template.value;
+        }
+        let markup = '';
+        let css_markup = '';
+        let js_head_markup = '';
+        let js_body_markup = '';
+        pageThemesResources[theme_name].css.forEach(function(file_name) {
+            css_markup += `<link rel="stylesheet" href="/assets/themes/${theme_name}/css/${file_name}.css" type="text/css">`;
+        });
+        pageThemesResources[theme_name].js_head.forEach(function(file_name) {
+            js_head_markup += `<script src="/assets/themes/${theme_name}/js/${file_name}.js"></script>`;
+        });
+        pageThemesResources[theme_name].js_body.forEach(function(file_name) {
+            js_body_markup += `<script src="/assets/themes/${theme_name}/js/${file_name}.js"></script>`;
+        });
         pageCreator._messages.forEach(function(mess, index) {
             markup += `
                 <p data-message="${index}" data-message_alignment="${mess.d_message_alignment}" data-message_variant="${mess.d_message_variant}">
@@ -226,9 +248,11 @@ const pageCreator = {
                 </p>
             `;
         });
-        const el_previewer_document = this.el_previewer.contentWindow.document;
-        // Insert messages markup
-        el_previewer_document.body.innerHTML = markup;
+        const el_previewer_document = pageCreator.el_previewer.contentWindow.document;
+        // Insert messages markup + JS body
+        el_previewer_document.head.innerHTML = css_markup + js_head_markup;
+        // Insert messages markup + JS body
+        el_previewer_document.body.innerHTML = markup + js_body_markup;
         // Edit mode on double click on message
         el_previewer_document.querySelectorAll('[data-message]').forEach(function(el) {
             el.addEventListener('dblclick', pageCreator._handlers._onDoubleClickMessage);
@@ -310,6 +334,7 @@ const pageCreator = {
     restore: function() {
         const restoration_data = JSON.parse(localStorage.getItem('discussion'));
         if (restoration_data !== null) {
+            console.log('jkl');
             // Restore custom personas
             let persona_presets_markup = '';
             restoration_data.custom_personas.forEach(function(data) {
