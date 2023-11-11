@@ -66,10 +66,13 @@ const pageCreator = {
             pageCreator.el_message_text.setRangeText(`${markdown}${selected}${markdown}`);
         },
         _onDoubleClickMessage: function(evt) {
-            function getChildElementIndex(node) {
-                return Array.prototype.indexOf.call(node.parentNode.children, node) - 1;
-              }
-            console.log(getChildElementIndex(evt.target.closest('[data-message]')));
+            pageCreator.el_previewer.contentWindow.document.querySelectorAll('[data-message]').forEach(function(el, index) {
+                const el_message = evt.target.closest('[data-message]');
+                if (el_message.dataset.message == index) {
+                    pageCreator.editMessage(index);
+                    el_message.removeEventListener('dblclick', pageCreator._handlers._onDoubleClickMessage);
+                }
+            })
         }
     },
     // wrapSelectedText: function(markdown = '') {
@@ -215,7 +218,7 @@ const pageCreator = {
         `;
         pageCreator._messages.forEach(function(mess, index) {
             markup += `
-                <p data-message="" data-message_alignment="${mess.d_message_alignment}" data-message_variant="${mess.d_message_variant}">
+                <p data-message="${index}" data-message_alignment="${mess.d_message_alignment}" data-message_variant="${mess.d_message_variant}">
                     <span data-message_text="">${mess.d_message_text}</span><br>
                     <cite data-message_persona="">${mess.d_message_persona_full_name || mess.d_message_persona_preset}</cite><br>
                     <button class="cmd_remove_message" onclick="window.parent.pageCreator.removeMessage('${index}')">remove</button>
