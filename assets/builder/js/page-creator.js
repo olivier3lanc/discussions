@@ -91,6 +91,9 @@ const pageCreator = {
     //         range.insertNode(document.createTextNode(`${markdown}${selected_text}${markdown}`));
     //     }
     // },
+    checkFields: function() {
+
+    },
     // Submit message form 
     // Prepare publish
     // Update preview
@@ -108,6 +111,7 @@ const pageCreator = {
         let message_is_postable = true;
         // Check validity for message fields
         this._formdata_d_message_fields.forEach(function(field) {
+            console.log(field)
             const el_input_form = document.querySelector(`[name="${field}"]`);
             const el_error_display = document.querySelector(`#${field}__error`);
             let error_html = '';
@@ -447,6 +451,7 @@ pageCreator.el_page_form.addEventListener('submit', pageCreator._handlers._onSub
 pageCreator.el_message_form.addEventListener('submit', pageCreator._handlers._onSubmitFormMessage);
 pageCreator.el_message_persona_preset_new.addEventListener('click', pageCreator._handlers._onClickPersonaNew);
 pageCreator.el_message_text.addEventListener("keydown", pageCreator._handlers._onTextareaEnter);
+pageCreator.el_previewer.addEventListener("load", pageCreator.buildPage);
 pageCreator.restore();
 
 window.pageCreator = {
