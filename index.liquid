@@ -140,6 +140,7 @@
                                 <input type="text"
                                     id="d_message_persona_full_name"
                                     name="d_message_persona_full_name"
+                                    autocomplete="off"
                                     required>
                                 <label for="d_message_persona_full_name"
                                     class="c-dim m-order--1">
@@ -202,16 +203,6 @@
             </div>
             <iframe class="c-dim m-grow" id="d_previewer" src="/assets/builder/index.html"></iframe>
         </div>
-        <h2>Pages</h2>
-        <ul>
-            {% for cms_page in cms_fetch_pages %}
-                <li>
-                    <a href="/discussions/{{ cms_page.permalink }}">
-                        {{ cms_page.title }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
     </main>
 
     <script src="/assets/builder/js/page-creator.js"></script>
