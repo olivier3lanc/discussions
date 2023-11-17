@@ -91,38 +91,37 @@ const pageCreator = {
     //         range.insertNode(document.createTextNode(`${markdown}${selected_text}${markdown}`));
     //     }
     // },
-    checkFields: function() {
-
-    },
-    // Submit message form 
-    // Prepare publish
-    // Update preview
-    addMessage: function() {
-        // Init message related fields
-        pageCreator._formdata_d_message_fields = [];
-        // Get form data
-        pageCreator.formdata_d_message = new FormData(pageCreator.el_message_form);
-        // Get all message fields names and store them into an array
-        for (let key of pageCreator.formdata_d_message.keys()) {
-            pageCreator._formdata_d_message_fields.push(key);
-        }
-        // Adding a message is authorized
-        // unless invalid field
-        let message_is_postable = true;
+    _checkFields: function(fields_array) {
+        // Inputs are valid unless invalid is detected
+        let is_postable = true;
         // Check validity for message fields
-        this._formdata_d_message_fields.forEach(function(field) {
-            console.log(field)
+        fields_array.forEach(function(field) {
             const el_input_form = document.querySelector(`[name="${field}"]`);
             const el_error_display = document.querySelector(`#${field}__error`);
             let error_html = '';
             if (!el_input_form.checkValidity()) {
-                message_is_postable = false;
+                is_postable = false;
                 error_html = 'error';
             }
             if (el_error_display !== null) {
                 el_error_display.innerHTML = error_html;
             }
         });
+        return is_postable;
+    },
+    // Submit message form 
+    // Prepare publish
+    // Update preview
+    addMessage: function() {
+        // Init message related fields
+        this._formdata_d_message_fields = [];
+        // Get form data
+        this.formdata_d_message = new FormData(this.el_message_form);
+        // Get all message fields names and store them into an array
+        for (let key of this.formdata_d_message.keys()) {
+            pageCreator._formdata_d_message_fields.push(key);
+        };
+        const message_is_postable = this._checkFields(this._formdata_d_message_fields);
         // If message is postable
         // Add it to the pool
         if (message_is_postable) {
@@ -164,8 +163,6 @@ const pageCreator = {
 	    return to_plain_text.trim(); // using trim method to remove whitespace
     },
     publish: function() {
-        // Adding a page is enabled
-        let page_is_publishable = true;
         // Init pages related fields
         pageCreator._formdata_d_page_fields = [];
 
@@ -174,18 +171,8 @@ const pageCreator = {
         for (var key of pageCreator.formdata_d_page.keys()) {
             pageCreator._formdata_d_page_fields.push(key);
         }
-
-        // Check validity for pages fields
-        this._formdata_d_page_fields.forEach(function(field) {
-            const el_input_form = document.querySelector(`[name="${field}"]`);
-            const el_error_display = document.querySelector(`#${field}__error`);
-            if (el_input_form.checkValidity()) {
-                el_error_display.innerHTML = "";
-            } else {
-                el_error_display.innerHTML = "error";
-                page_is_publishable = false;
-            }
-        });
+        
+        const page_is_publishable = this._checkFields(this._formdata_d_page_fields);
 
         // If page is postable
         // Add it to the pool
