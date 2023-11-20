@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- COMMON METADATA -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="msapplication-starturl" content="{{ page.url }}">
+    <meta property="og:url" content="{{ page.url }}">
+    <meta name="twitter:url" content="{{ page.url }}">
+
+    {%- render 'model_page_metadata',
+        title: 'Le titre',
+        description: 'la description',
+        image: 'https://og-image.vercel.app/discussions.png?theme=light&md=1&fontSize=140px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fhyper-color-logo.svg',
+        envmode: site.environment
+    -%}
+
+    <style>
+        /* retrait style <details> par défaut de iOS */
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        /* retrait style <button> et <select> par défaut de iOS */
+        select, button {
+            color: black
+        }
+    </style>
+</head>
+
+<body>
+    <script src="/assets/builder/js/themes.js"></script>
+    <script src="/assets/builder/js/page-builder.js"></script>
+</body>
+
+</html>

@@ -1,10 +1,3 @@
-const pageThemesResources = {
-    default: {
-        css: ['preview'],
-        js_head: ['foo'],
-        js_body: ['bar']
-    }
-}
 const pageCreator = {
     // DOM elements
     el_page_form: document.getElementById('d_page_form'),
