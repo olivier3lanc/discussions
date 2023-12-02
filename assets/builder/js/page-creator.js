@@ -164,9 +164,21 @@ const pageCreator = {
         for (var key of pageCreator.formdata_d_page.keys()) {
             pageCreator._formdata_d_page_fields.push(key);
         }
-        
-        const page_is_publishable = this._checkFields(this._formdata_d_page_fields);
-
+        // Page is publishable by default
+        let page_is_publishable = true;
+        // Log errors to be displayed
+        // Tell user why page is not publishable
+        let publish_error_log = [];
+        // Check if page fields are not set properly
+        if (!this._checkFields(this._formdata_d_page_fields)) {
+            page_is_publishable = false;
+            publish_error_log.push('Some page fields are wrong, please check.');
+        }
+        // Check if at least 1 message
+        if (pageCreator._messages.length == 0) {
+            page_is_publishable = false;
+            publish_error_log.push('At least one message must be written.');
+        }
         // If page is postable
         // Add it to the pool
         if (page_is_publishable) {
@@ -186,7 +198,7 @@ const pageCreator = {
                 .then((response) => pageCreator.getPageData(response))
                 .catch((err) => console.error(err));
         } else {
-            console.log("page is not postable, check forms");
+            console.log(publish_error_log);
         }
     },
     getPageData: function(data) {
@@ -204,42 +216,14 @@ const pageCreator = {
         return string.replace(/(<([^>]+)>)/gi, "");
     },
     buildPage: function() {
-        const el_input_current_template = document.querySelector('[name="d_page_theme"]:checked');
-        let theme_name = 'default';
-        if (el_input_current_template !== null) {
-            theme_name = el_input_current_template.value;
-        }
-        let markup = '';
-        let css_markup = '';
-        let js_head_markup = '';
-        let js_body_markup = '';
-        pageThemesResources[theme_name].css.forEach(function(file_name) {
-            css_markup += `<link rel="stylesheet" href="/assets/themes/${theme_name}/css/${file_name}.css" type="text/css">`;
-        });
-        pageThemesResources[theme_name].js_head.forEach(function(file_name) {
-            js_head_markup += `<script src="/assets/themes/${theme_name}/js/${file_name}.js"></script>`;
-        });
-        pageThemesResources[theme_name].js_body.forEach(function(file_name) {
-            js_body_markup += `<script src="/assets/themes/${theme_name}/js/${file_name}.js"></script>`;
-        });
-        pageCreator._messages.forEach(function(mess, index) {
-            markup += `
-                <p data-message="${index}" data-message_alignment="${mess.d_message_alignment}" data-message_variant="${mess.d_message_variant}">
-                    <span data-message_text="">${mess.d_message_text}</span><br>
-                    <cite data-message_persona="">${mess.d_message_persona_full_name || mess.d_message_persona_preset}</cite><br>
-                    <button class="cmd_remove_message" onclick="window.parent.pageCreator.removeMessage('${index}')">remove</button>
-                    <button class="cmd_edit_message" onclick="window.parent.pageCreator.editMessage('${index}')">edit</button>
-                </p>
-            `;
-        });
-        const el_previewer_document = pageCreator.el_previewer.contentWindow.document;
-        // Insert messages markup + JS body
-        el_previewer_document.head.innerHTML = css_markup + js_head_markup;
-        // Insert messages markup + JS body
-        el_previewer_document.body.innerHTML = markup + js_body_markup;
-        // Edit mode on double click on message
-        el_previewer_document.querySelectorAll('[data-message]').forEach(function(el) {
-            el.addEventListener('dblclick', pageCreator._handlers._onDoubleClickMessage);
+        pageRun.build({
+            messages: pageCreator._messages,
+            page: {
+                d_page_languages: "",
+                d_page_title: "",
+                d_page_description:	"",
+                d_page_theme: "default"
+            }
         })
         // scroll to the last message
         // const el_last_message = el_previewer_document.querySelector('p:last-child');
@@ -318,7 +302,6 @@ const pageCreator = {
     restore: function() {
         const restoration_data = JSON.parse(localStorage.getItem('discussion'));
         if (restoration_data !== null) {
-            console.log('jkl');
             // Restore custom personas
             let persona_presets_markup = '';
             restoration_data.custom_personas.forEach(function(data) {
@@ -328,6 +311,7 @@ const pageCreator = {
 
             // Restore messages
             this._messages = restoration_data.messages;
+            console.log('restored');
             this.buildPage();
         }
     },
