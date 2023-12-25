@@ -22,7 +22,7 @@ const pageRun = {
         }
     },
     build: function(response) {
-        // console.log(r);
+        console.log(response);
         const markup = this.themes[response.page.d_page_theme](response.messages);
         document.title = response.page.d_page_title;
         const el_title = document.querySelector('#d_page_title');
@@ -52,14 +52,28 @@ const pageRun = {
             document.querySelector('main').innerHTML = markup;
         }
     },
-    update: function(id) {
-        if (id !== undefined) {
-            fetch("https://olivier3lanc.ovh/api/index.php?id=" + id, {
+    getJSON: function(page_id) {
+        if (page_id !== undefined) {
+            fetch("https://olivier3lanc.ovh/api/index.php?id=" + page_id, {
                     method: "GET",
                 })
                 .then((response) => response.json())
-                .then((response) => pageRun.build(response))
+                .then((response) => {
+                    if (response.error === undefined) {
+                        pageRun.build(response)
+                    } else {
+                        alert(response.error)
+                    }
+                })
                 .catch((err) => console.error(err));
+        }
+    },
+    update: function() {
+        const params = new URLSearchParams(document.location.search);
+        const page_id = params.get("id");
+        if (page_id !== null) {
+            pageRun.getJSON(page_id);
         }
     }
 };
+pageRun.update();

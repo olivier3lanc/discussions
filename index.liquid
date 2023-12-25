@@ -57,7 +57,7 @@
                 <details open="">
                     <summary>Discussion / Page</summary>
                     <form id="d_page_form">
-                        <div class="c-dis m-flex m-column">
+                        {% comment %} <div class="c-dis m-flex m-column">
                             <select id="d_page_languages"
                                 name="d_page_languages"
                                 minlength="2"
@@ -75,7 +75,7 @@
                                 Language used into the discusion
                             </label>
                             <div id="d_page_languages__error"></div>
-                        </div>
+                        </div> {% endcomment %}
                         <div class="c-dis m-flex m-column">
                             <input type="text"
                                 id="d_page_title"
@@ -87,14 +87,14 @@
                             </label>
                             <div id="d_page_title__error"></div>
                         </div>
-                        <div class="c-dis m-flex m-column">
+                        {% comment %} <div class="c-dis m-flex m-column">
                             <textarea id="d_page_description" name="d_page_description"></textarea>
                             <label for="d_page_description"
                                 class="c-dim m-order--1">
                                 Description of the discusion
                             </label>
                             <div id="d_page_description__error"></div>
-                        </div>
+                        </div> {% endcomment %}
                         <div class="c-dis m-flex">
                             {% for page_theme in parameters.page_themes %}
                                 <div class="c-dis m-flex m-cross-center">
@@ -161,7 +161,7 @@
                             </label>
                             <div id="d_message_text__error"></div>
                         </div>
-                        <fieldset>
+                        {% comment %} <fieldset>
                             <legend>Alignment</legend>
                             <div class="c-dis m-flex m-gap-6">
                                 {% for alignment in parameters.alignment_values %}
@@ -177,7 +177,7 @@
                                 {% endfor %}
                                 <div id="d_message_alignment__error"></div>
                             </div>
-                        </fieldset>
+                        </fieldset> {% endcomment %}
 
                         <fieldset>
                             <legend>Variant</legend>

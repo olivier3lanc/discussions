@@ -10,6 +10,8 @@ const pageCreator = {
     el_message_persona_full_name: document.getElementById('d_message_persona_full_name'),
     el_message_text: document.getElementById('d_message_text'),
     el_previewer: document.getElementById('d_previewer'),
+    // Message being edited
+    _editingMessages: false,
     // Temp array for messages
     _messages: [],
     // Event handlers
@@ -38,9 +40,9 @@ const pageCreator = {
             pageCreator.save();
         },
         _fetchPageResponse: function(response, id) {
-            console.log(response,id);
-            pageCreator._messages = response.messages;
-            pageCreator.buildPage();
+            pageCreator.clear();
+            const link_markup = `<a href="${location.protocol}//${location.host}/read/?id=${id}" target="_blank">link</a>`;
+            document.body.insertAdjacentHTML('afterbegin', link_markup);
         },
         // Make "Enter" key in a textarea submit a form
         // https://stackoverflow.com/a/49389811
@@ -219,12 +221,11 @@ const pageCreator = {
         pageRun.build({
             messages: pageCreator._messages,
             page: {
-                d_page_languages: "",
                 d_page_title: "",
-                d_page_description:	"",
                 d_page_theme: "default"
             }
-        })
+        });
+        pageCreator._editingMessages = false;
         // scroll to the last message
         // const el_last_message = el_previewer_document.querySelector('p:last-child');
         // if (el_last_message !== null) {
@@ -338,7 +339,7 @@ const pageCreator = {
     clear: function() {
         if (this.localStorageAvailable()) {
             localStorage.removeItem('discussion');
-            location.reload();
+            // location.reload();
         }
     },
     renderCmdInputRadio: function(data) {
@@ -356,40 +357,46 @@ const pageCreator = {
     // Edit message
     editMessage: function(index) {
         console.log('edit:',index);
-        const el_to_edit = pageCreator.el_previewer.contentWindow.document.querySelectorAll('[data-message]')[index];
-        const el_message = el_to_edit.querySelector('[data-message_text]');
-        const el_persona = el_to_edit.querySelector('[data-message_persona]');
-        const handler_on_enter_key = function(evt) {
-            if (evt.which === 13) {
-                window.parent.pageCreator.saveMessage(index)
+        // If not already being edited
+        if (!pageCreator._editingMessages) {
+            const el_to_edit = pageCreator.el_previewer.contentWindow.document.querySelectorAll('[data-message]')[index];
+            const el_message = el_to_edit.querySelector('[data-message_text]');
+            const el_persona = el_to_edit.querySelector('[data-message_persona]');
+            const handler_on_enter_key = function(evt) {
+                if (evt.which === 13) {
+                    window.parent.pageCreator.saveMessage(index)
+                }
             }
+            el_message.innerHTML = pageCreator.customParseReverse(el_message.innerHTML);
+            el_message.addEventListener('keydown', handler_on_enter_key);
+            el_persona.innerHTML = pageCreator.customParseReverse(el_persona.innerHTML);
+            el_persona.addEventListener('keydown', handler_on_enter_key);
+            el_message.contentEditable = true;
+            el_persona.contentEditable = true;
+            let commands_markup = '';
+            const parameters_to_adjust = ['alignment', 'variant'];
+            parameters_to_adjust.forEach(function(param_name) {
+                const current_value = el_to_edit.dataset['message_'+param_name];
+                let possible_values = [];
+                document.querySelectorAll(`[name="d_message_${param_name}"]`).forEach(function(el) {
+                    possible_values.push(el.value);
+                });
+                possible_values.forEach(function(value) {
+                    commands_markup += pageCreator.renderCmdInputRadio({
+                        index: index,
+                        field: param_name,
+                        value: value,
+                        checked: current_value
+                    })
+                });
+            });
+            commands_markup += `<button onclick="window.parent.pageCreator.saveMessage(${index})">save</button>`;
+            el_to_edit.insertAdjacentHTML('beforeend', commands_markup);
+            el_to_edit.querySelector('.cmd_edit_message').remove();
+            pageCreator._editingMessages = true;
+        } else {
+            console.log('A message is currently being edited');
         }
-        el_message.innerHTML = pageCreator.customParseReverse(el_message.innerHTML);
-        el_message.addEventListener('keydown', handler_on_enter_key);
-        el_persona.innerHTML = pageCreator.customParseReverse(el_persona.innerHTML);
-        el_persona.addEventListener('keydown', handler_on_enter_key);
-        el_message.contentEditable = true;
-        el_persona.contentEditable = true;
-        let commands_markup = '';
-        const parameters_to_adjust = ['alignment', 'variant'];
-        parameters_to_adjust.forEach(function(param_name) {
-            const current_value = el_to_edit.dataset['message_'+param_name];
-            let possible_values = [];
-            document.querySelectorAll(`[name="d_message_${param_name}"]`).forEach(function(el) {
-                possible_values.push(el.value);
-            });
-            possible_values.forEach(function(value) {
-                commands_markup += pageCreator.renderCmdInputRadio({
-                    index: index,
-                    field: param_name,
-                    value: value,
-                    checked: current_value
-                })
-            });
-        });
-        commands_markup += `<button onclick="window.parent.pageCreator.saveMessage(${index})">save</button>`;
-        el_to_edit.insertAdjacentHTML('beforeend', commands_markup);
-        el_to_edit.querySelector('.cmd_edit_message').remove();
     },
     // Save message
     saveMessage: function(index) {
@@ -405,10 +412,10 @@ const pageCreator = {
         const new_persona = pageCreator.customParse(new_sanitized_persona);
         pageCreator._messages[index]['d_message_persona_full_name'] = new_persona;
         pageCreator._messages[index]['d_message_text'] = new_message;
-        pageCreator._messages[index]['d_message_alignment'] = el_to_edit.querySelector(`[name="cmd_${index}_alignment"]:checked`).value;
         pageCreator._messages[index]['d_message_variant'] = el_to_edit.querySelector(`[name="cmd_${index}_variant"]:checked`).value;
         pageCreator.buildPage();
         pageCreator.save();
+        console.log(pageCreator._editingMessages)
     }
 };
 pageCreator.el_page_form.addEventListener('submit', pageCreator._handlers._onSubmitFormPage);
