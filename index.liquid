@@ -54,152 +54,148 @@
         <div class="c-dis m-flex m-gap-10">
             <div class="c-dis m-flex m-column m-gap-6">
                 <button onclick="pageCreator.clear()">Clear saved data</button>
-                <details open="">
-                    <summary>Discussion / Page</summary>
-                    <form id="d_page_form">
-                        {% comment %} <div class="c-dis m-flex m-column">
-                            <select id="d_page_languages"
-                                name="d_page_languages"
-                                minlength="2"
-                                maxlength="2"
-                                required>
-                                <option value="">-</option>
-                                {% for language in parameters.page_languages %}
-                                    <option value="{{ language }}">
-                                        {{ language }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <label for="d_page_languages"
-                                class="c-dim m-order--1">
-                                Language used into the discusion
-                            </label>
-                            <div id="d_page_languages__error"></div>
-                        </div> {% endcomment %}
-                        <div class="c-dis m-flex m-column">
-                            <input type="text"
-                                id="d_page_title"
-                                name="d_page_title"
-                                required>
-                            <label for="d_page_title"
-                                class="c-dim m-order--1">
-                                Title of the discusion
-                            </label>
-                            <div id="d_page_title__error"></div>
-                        </div>
-                        {% comment %} <div class="c-dis m-flex m-column">
-                            <textarea id="d_page_description" name="d_page_description"></textarea>
-                            <label for="d_page_description"
-                                class="c-dim m-order--1">
-                                Description of the discusion
-                            </label>
-                            <div id="d_page_description__error"></div>
-                        </div> {% endcomment %}
-                        <div class="c-dis m-flex">
-                            {% for page_theme in parameters.page_themes %}
+                
+                <form id="d_page_form">
+                    {% comment %} <div class="c-dis m-flex m-column">
+                        <select id="d_page_languages"
+                            name="d_page_languages"
+                            minlength="2"
+                            maxlength="2"
+                            required>
+                            <option value="">-</option>
+                            {% for language in parameters.page_languages %}
+                                <option value="{{ language }}">
+                                    {{ language }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <label for="d_page_languages"
+                            class="c-dim m-order--1">
+                            Language used into the discusion
+                        </label>
+                        <div id="d_page_languages__error"></div>
+                    </div> {% endcomment %}
+                    <div class="c-dis m-flex m-column">
+                        <input type="text"
+                            id="d_page_title"
+                            name="d_page_title"
+                            required>
+                        <label for="d_page_title"
+                            class="c-dim m-order--1">
+                            Title of the discusion
+                        </label>
+                        <div id="d_page_title__error"></div>
+                    </div>
+                    {% comment %} <div class="c-dis m-flex m-column">
+                        <textarea id="d_page_description" name="d_page_description"></textarea>
+                        <label for="d_page_description"
+                            class="c-dim m-order--1">
+                            Description of the discusion
+                        </label>
+                        <div id="d_page_description__error"></div>
+                    </div> {% endcomment %}
+                    <div class="c-dis m-flex">
+                        {% for page_theme in parameters.page_themes %}
+                            <div class="c-dis m-flex m-cross-center">
+                                <input type="radio"
+                                    id="d_page_theme_{{ page_theme }}"
+                                    name="d_page_theme" 
+                                    value="{{ page_theme }}"
+                                    {% if forloop.first %}checked{% endif %}>
+                                <label for="d_page_theme_{{ page_theme }}">
+                                    {{ page_theme }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        <div id="d_page_theme__error"></div>
+                    </div>
+                    <button type="submit">Publish</button>
+                </form>
+                
+                <form id="d_message_form">
+                    <fieldset>
+                        <legend>Persona</legend>
+
+                        <fieldset>
+                            <legend>Presets</legend>
+                            <div id="d_message_persona_presets_container"
+                                class="c-dis m-flex m-gap-6">
                                 <div class="c-dis m-flex m-cross-center">
                                     <input type="radio"
-                                        id="d_page_theme_{{ page_theme }}"
-                                        name="d_page_theme" 
-                                        value="{{ page_theme }}"
-                                        {% if forloop.first %}checked{% endif %}>
-                                    <label for="d_page_theme_{{ page_theme }}">
-                                        {{ page_theme }}
+                                        id="d_message_persona_preset_new"
+                                        name="d_message_persona_preset" 
+                                        value="new"
+                                        checked>
+                                    <label for="d_message_persona_preset_new">
+                                        New
+                                    </label>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="c-dis m-flex m-column">
+                            <input type="text"
+                                id="d_message_persona_full_name"
+                                name="d_message_persona_full_name"
+                                autocomplete="off"
+                                required>
+                            <label for="d_message_persona_full_name"
+                                class="c-dim m-order--1">
+                                Full Name
+                            </label>
+                            <div id="d_message_persona_full_name__error"></div>
+                        </div>
+                    </fieldset>
+                    <div class="c-dis m-flex m-column">
+                        <textarea id="d_message_text"
+                            name="d_message_text"
+                            minlength="1"
+                            maxlength="512"
+                            required></textarea>
+                        <label for="d_message_text"
+                            class="c-dim m-order--1">
+                            Message
+                        </label>
+                        <div id="d_message_text__error"></div>
+                    </div>
+                    {% comment %} <fieldset>
+                        <legend>Alignment</legend>
+                        <div class="c-dis m-flex m-gap-6">
+                            {% for alignment in parameters.alignment_values %}
+                                <div class="c-dis m-flex m-cross-center">
+                                    <input type="radio"
+                                        id="d_message_alignment_{{ alignment }}"
+                                        name="d_message_alignment" 
+                                        value="{{ alignment }}" {% if forloop.first %}checked{% endif %}>
+                                    <label for="d_message_alignment_{{ alignment }}">
+                                        {{ alignment }}
                                     </label>
                                 </div>
                             {% endfor %}
-                            <div id="d_page_theme__error"></div>
+                            <div id="d_message_alignment__error"></div>
                         </div>
-                        <button type="submit">Publish</button>
-                    </form>
-                </details>
-                <details open="">
-                    <summary>Message</summary>
-                    <form id="d_message_form">
-                        <fieldset>
-                            <legend>Persona</legend>
+                    </fieldset> {% endcomment %}
 
-                            <fieldset>
-                                <legend>Presets</legend>
-                                <div id="d_message_persona_presets_container"
-                                    class="c-dis m-flex m-gap-6">
-                                    <div class="c-dis m-flex m-cross-center">
-                                        <input type="radio"
-                                            id="d_message_persona_preset_new"
-                                            name="d_message_persona_preset" 
-                                            value="new"
-                                            checked>
-                                        <label for="d_message_persona_preset_new">
-                                            New
-                                        </label>
-                                    </div>
+                    <fieldset>
+                        <legend>Variant</legend>
+                        <div class="c-dis m-flex m-gap-6">
+                            {% for i in (1..3) %}
+                                <div class="c-dis m-flex m-cross-center">
+                                    <input type="radio"
+                                        id="d_message_variant_{{ i }}"
+                                        name="d_message_variant" 
+                                        value="{{ i }}"
+                                        {% if forloop.first %}checked{% endif %}>
+                                    <label for="d_message_variant_{{ i }}">
+                                        Variant {{ i }}
+                                    </label>
                                 </div>
-                            </fieldset>
-
-                            <div class="c-dis m-flex m-column">
-                                <input type="text"
-                                    id="d_message_persona_full_name"
-                                    name="d_message_persona_full_name"
-                                    autocomplete="off"
-                                    required>
-                                <label for="d_message_persona_full_name"
-                                    class="c-dim m-order--1">
-                                    Full Name
-                                </label>
-                                <div id="d_message_persona_full_name__error"></div>
-                            </div>
-                        </fieldset>
-                        <div class="c-dis m-flex m-column">
-                            <textarea id="d_message_text"
-                                name="d_message_text"
-                                minlength="1"
-                                maxlength="512"
-                                required></textarea>
-                            <label for="d_message_text"
-                                class="c-dim m-order--1">
-                                Message
-                            </label>
-                            <div id="d_message_text__error"></div>
+                            {% endfor %}
+                            <div id="d_message_variant__error"></div>
                         </div>
-                        {% comment %} <fieldset>
-                            <legend>Alignment</legend>
-                            <div class="c-dis m-flex m-gap-6">
-                                {% for alignment in parameters.alignment_values %}
-                                    <div class="c-dis m-flex m-cross-center">
-                                        <input type="radio"
-                                            id="d_message_alignment_{{ alignment }}"
-                                            name="d_message_alignment" 
-                                            value="{{ alignment }}" {% if forloop.first %}checked{% endif %}>
-                                        <label for="d_message_alignment_{{ alignment }}">
-                                            {{ alignment }}
-                                        </label>
-                                    </div>
-                                {% endfor %}
-                                <div id="d_message_alignment__error"></div>
-                            </div>
-                        </fieldset> {% endcomment %}
-
-                        <fieldset>
-                            <legend>Variant</legend>
-                            <div class="c-dis m-flex m-gap-6">
-                                {% for i in (1..3) %}
-                                    <div class="c-dis m-flex m-cross-center">
-                                        <input type="radio"
-                                            id="d_message_variant_{{ i }}"
-                                            name="d_message_variant" 
-                                            value="{{ i }}"
-                                            {% if forloop.first %}checked{% endif %}>
-                                        <label for="d_message_variant_{{ i }}">
-                                            Variant {{ i }}
-                                        </label>
-                                    </div>
-                                {% endfor %}
-                                <div id="d_message_variant__error"></div>
-                            </div>
-                        </fieldset>
-                        <button type="submit">Add</button>
-                    </form>
-                </details>
+                    </fieldset>
+                    <button type="submit">Add</button>
+                </form>
             </div>
             <iframe class="c-dim m-grow" id="d_previewer" src="/read/index.html"></iframe>
         </div>

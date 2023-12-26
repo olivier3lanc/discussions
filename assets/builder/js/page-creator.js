@@ -37,12 +37,11 @@ const pageCreator = {
             console.log('_onClickRemovePersonaPreset');
             evt.preventDefault();
             evt.target.closest('div').remove();
-            pageCreator.save();
+            pageCreator.saveLocalStorage();
         },
-        _fetchPageResponse: function(response, id) {
-            pageCreator.clear();
-            const link_markup = `<a href="${location.protocol}//${location.host}/read/?id=${id}" target="_blank">link</a>`;
-            document.body.insertAdjacentHTML('afterbegin', link_markup);
+        _fetchPageResponse: function(page_id) {
+            const published_success_markup = pageCreator.renderPublishSuccess(page_id);
+            document.body.insertAdjacentHTML('afterbegin', published_success_markup);
         },
         // Make "Enter" key in a textarea submit a form
         // https://stackoverflow.com/a/49389811
@@ -131,7 +130,7 @@ const pageCreator = {
             console.log(this._messages);
             this.buildPage();
             this.addPersonaPreset();
-            this.save();
+            this.saveLocalStorage();
             pageCreator.el_message_text.value = '';
             pageCreator.el_message_persona_full_name.focus();
         } else {
@@ -210,7 +209,7 @@ const pageCreator = {
                     method: "GET",
                 })
                 .then((response) => response.json())
-                .then((response) => pageCreator._handlers._fetchPageResponse(response, data.id))
+                .then((response) => pageCreator._handlers._fetchPageResponse(data.id))
                 .catch((err) => console.error(err));
         }
     },
@@ -280,6 +279,50 @@ const pageCreator = {
             this.el_message_persona_full_name.disabled = true;
         }
     },
+    reset: function() {
+        pageCreator.clearLocalStorage();
+        pageCreator.el_page_form.reset();
+        location.reload();
+    },
+    copyToClipboard: function(text_to_copy) {
+        navigator.clipboard.writeText(text_to_copy).then(
+            function() {
+              /* clipboard successfully set */
+              alert('URL was copied to your clipboard') 
+            }, 
+            function() {
+              /* clipboard write failed */
+                // Create a "hidden" input
+                const aux = document.createElement("input");
+                // Assign it the value of the specified element
+                aux.setAttribute("value", text_to_copy);
+                // Append it to the body
+                document.body.appendChild(aux);
+                // Highlight its content
+                aux.select();
+                // Copy the highlighted text
+                document.execCommand("copy");
+                // Remove it from the body
+                document.body.removeChild(aux);
+                window.alert('Copied using the old way')
+            }
+        )
+    },
+    renderPublishSuccess: function(page_id) {
+        const link_url = `${location.protocol}//${location.host}/read/?id=${page_id}`;
+        return `
+            <dialog open>
+                
+                <nav>
+                    <p>Published ont this link: <a href="${link_url}" target="_blank">${link_url}</a></p>
+                    <button onclick="pageCreator.copyToClipboard('${link_url}')">Copy link</button>
+                </nav>
+                <form method="dialog">
+                    <button onclick="pageCreator.reset()">Restart</button>
+                </form>
+            </dialog>
+        `;
+    },
     renderCustomPersonaPreset: function(id, value) {
         return `
             <div class="
@@ -300,7 +343,7 @@ const pageCreator = {
             </div>
         `;
     },
-    restore: function() {
+    restoreLocalStorage: function() {
         const restoration_data = JSON.parse(localStorage.getItem('discussion'));
         if (restoration_data !== null) {
             // Restore custom personas
@@ -317,7 +360,7 @@ const pageCreator = {
         }
     },
     // Store on localStorage
-    save: function() {
+    saveLocalStorage: function() {
         console.log('saved');
         if (this.localStorageAvailable()) {
             const els_custom_personas_presets = document.querySelectorAll('.d_message_persona_custom_preset');
@@ -336,10 +379,9 @@ const pageCreator = {
         }
     },
     // Clear localStorage
-    clear: function() {
+    clearLocalStorage: function() {
         if (this.localStorageAvailable()) {
             localStorage.removeItem('discussion');
-            // location.reload();
         }
     },
     renderCmdInputRadio: function(data) {
@@ -414,7 +456,7 @@ const pageCreator = {
         pageCreator._messages[index]['d_message_text'] = new_message;
         pageCreator._messages[index]['d_message_variant'] = el_to_edit.querySelector(`[name="cmd_${index}_variant"]:checked`).value;
         pageCreator.buildPage();
-        pageCreator.save();
+        pageCreator.saveLocalStorage();
         console.log(pageCreator._editingMessages)
     }
 };
@@ -423,14 +465,14 @@ pageCreator.el_message_form.addEventListener('submit', pageCreator._handlers._on
 pageCreator.el_message_persona_preset_new.addEventListener('click', pageCreator._handlers._onClickPersonaNew);
 pageCreator.el_message_text.addEventListener("keydown", pageCreator._handlers._onTextareaEnter);
 pageCreator.el_previewer.addEventListener("load", pageCreator.buildPage);
-pageCreator.restore();
+pageCreator.restoreLocalStorage();
 
 window.pageCreator = {
     removeMessage: function(index) {
         index = parseInt(index);
         pageCreator._messages.splice(index, 1);
         pageCreator.buildPage();
-        pageCreator.save();
+        pageCreator.saveLocalStorage();
     },
     editMessage: function(index) {
         index = parseInt(index);

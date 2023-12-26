@@ -37,7 +37,7 @@ const pageRun = {
             // wait until iframe is loaded
             const insertMarkup = function() {
                 const el_main = pageCreator.el_previewer.contentWindow.document.querySelector('main');
-                if (el_main !== undefined) {
+                if (el_main !== null) {
                     el_main.innerHTML = markup;
                     const el_previewer_document = pageCreator.el_previewer.contentWindow.document;
                     // Edit mode on double click on message
